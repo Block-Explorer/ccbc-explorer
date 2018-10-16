@@ -40,15 +40,22 @@ async function syncBlocks(start, stop, clean = false) {
       txs: rpcblock.tx ? rpcblock.tx : [],
       ver: rpcblock.version
     });
+//console.log(`Block Object: ${ block }`);
+    
 
+   // console.log(`Saving BLock: ${ block.height  }`);
     await block.save();
 
+    //console.log(`BLock Saved: ${ block.height  }`);
     await forEachSeries(block.txs, async (txhash) => {
       const rpctx = await util.getTX(txhash);
 
       if (blockchain.isPoS(block)) {
+       // console.log(`Add POS BLock: ${ block.height  } RPX: ${rpctx}`);
         await util.addPoS(block, rpctx);
       } else {
+       // console.log(`Add POW BLock: ${ block.height  } RPX: ${rpctx}`);
+        //console.log(rpctx);
         await util.addPoW(block, rpctx);
       }
     });

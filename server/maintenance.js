@@ -15,7 +15,7 @@ app.use((req, res) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Bulwark Explorer</title>
+        <title>CryptoCashBack Block Explorer</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css.maps" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
@@ -69,7 +69,7 @@ a {
   position:relative;
   text-decoration:none;
   padding:1em 2em;
-  background-color:rgba(41, 77, 234, 1);
+  background-color:rgba(255, 165, 0, 1);
   border-radius:4px;
   opacity:1;
   max-width:48%;
@@ -81,15 +81,15 @@ a {
   </head>
   <body>
     <div class="logo">
-      <a href="https://bulwarkcrypto.com/">
-        <img src="https://bulwarkcrypto.com/wp-content/uploads/2018/06/logo@2x.png" title="Bulwark Crypto"/>
+      <a href="https://ccbcoin.club">
+        <img src="https://ccbcoin.club/img/stocks/bitcoin.png" title="CryptoCashBack Crypto"/>
       </a>
       </div>
     <div class="container">
         <img src="https://media.giphy.com/media/vIDsZm5DMZ5Ha/giphy.gif" title="Sad Explorer."/>
       <h1>Maintenance</h1>
-      <p>Bulwark Explorer is not available at this moment.<br/>Please check back later.</p><br/>
-  <a href="https://bulwarkcrypto.com/" class="button">Back to Main</a>
+      <p>CryptoCashBack Block Explorer is not available at this moment.<br/>Please check back later.</p><br/>
+  <a href="https://ccbcoin.club" class="button">Back to Main</a>
       </div>
   </body>
 </html>

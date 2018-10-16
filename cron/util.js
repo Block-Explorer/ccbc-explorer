@@ -46,10 +46,10 @@ async function vout(rpctx, blockHeight) {
       if (vout.value <= 0) {
         return;
       }
-
+      console.log(`Block Height: ${blockHeight} - Address ${(typeof  vout.scriptPubKey.addresses  !== 'undefined')?vout.scriptPubKey.addresses[0]:-100}`)
       const to = {
         blockHeight,
-        address: vout.scriptPubKey.addresses[0],
+        address: (typeof  vout.scriptPubKey.addresses  !== 'undefined')?vout.scriptPubKey.addresses[0]:-100,
         n: vout.n,
         value: vout.value
       };

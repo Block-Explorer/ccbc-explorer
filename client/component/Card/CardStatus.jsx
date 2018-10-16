@@ -9,7 +9,7 @@ import CountUp from '../CountUp';
 
 export default class CardStatus extends Component {
   static defaultProps = {
-    avgBlockTime: 90,
+    avgBlockTime: 60,
     avgMNTime: 24,
     blocks: 0,
     peers: 0,

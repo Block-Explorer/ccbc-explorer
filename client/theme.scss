@@ -1,5 +1,8 @@
 
 /* Variables */
+$orange:#FFA500;
+$orange-dark:rgb(161, 107, 7);
+$orangelight:#faab18;
 $black: #151515;
 $blue: rgba(41, 77, 234, 1);
 $blue-dark: #595ff5;
@@ -55,9 +58,9 @@ $pagination-bg:                     $white;
 $pagination-border-width:           1px;
 $pagination-border-color:           $gray;
 
-$pagination-hover-color:            $blue;
+$pagination-hover-color:            $orange;
 $pagination-hover-bg:            	$white;
-$pagination-hover-border-color:    	$blue;
+$pagination-hover-border-color:    	$orange;
 
 $pagination-active-color:           $black;
 $pagination-active-bg:           	$white;
@@ -109,7 +112,7 @@ a, a:visited {
 }
 
 a:hover {
-	color: $blue;
+	color: $orange;
 	text-decoration: none;
 	transition: all 1s cubic-bezier(0, 1, .5, 1);
 }

@@ -53,7 +53,7 @@ const getAddress = async (req, res) => {
 const getAvgBlockTime = () => {
   // When does the cache expire.
   // For now this is hard coded.
-  let cache = 90.0;
+  let cache = 60.0;
   let cutOff = moment().utc().add(60, 'seconds').unix();
   let loading = true;
 
@@ -83,7 +83,7 @@ const getAvgBlockTime = () => {
   getAvg();
 
   return async (req, res) => {
-    res.json(cache || 0.0);
+    res.json(!cache ? 0.0 : cache);
 
     // If the cache has expired then go ahead
     // and get a new one but return the current
