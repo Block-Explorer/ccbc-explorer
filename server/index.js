@@ -44,8 +44,8 @@ else {
   // Setup the routes.
   router(app);
   // Start the server.
-  app.listen(config.api.port, () => {
-    console.log(`BlocEx running on port ${ config.api.port }`);
+  app.listen(config.api.server_port, () => {
+    console.log(`BlocEx running on port ${ config.api.server_port }`);
   });
 
   // Export for testing.
