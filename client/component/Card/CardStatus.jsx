@@ -60,11 +60,11 @@ export default class CardStatus extends Component {
         </div>
         <div className="card__row">
           <span className="card__label">Avg. Block Time:</span>
-          <span className="card__result">{ this.props.avgBlockTime.toFixed(2) } seconds</span>
+          <span className="card__result">{ (this.props.avgBlockTime !==null && this.props.avgBlockTime !== '' && this.props.avgBlockTime !== 0) ? this.props.avgBlockTime.toFixed(2) : 0 } seconds</span>
         </div>
         <div className="card__row">
           <span className="card__label">Avg. MN Payment:</span>
-          <span className="card__result">{ this.props.avgMNTime.toFixed(2) } hours</span>
+          <span className="card__result">{ (this.props.avgMNTime !==null && this.props.avgMNTime !== '' && this.props.avgMNTime !== 0) ? this.props.avgMNTime.toFixed(2) : 0 } hours</span>
         </div>
       </Card>
       </div>
