@@ -100,7 +100,7 @@ class Statistics extends Component {
     });
     prices.forEach((v, k) => {
       avgPrice += v / l;
-      prices.set(k, numeral(v / l).format('0,0.00'));
+      prices.set(k, numeral(v / l).format('0,0.0000'));
     });
     avgHash = avgHash / hashes.size;
     avgMN = avgMN / mns.size;
@@ -152,8 +152,8 @@ class Statistics extends Component {
           <div className="row">
             <div className="col-md-12 col-lg-6">
               <h3>CryptoCashBack Price USD</h3>
-              <h4>{ numeral(this.props.coin.usd).format('$0,0.00') } { day }</h4>
-              <h5>{ numeral(this.props.coin.btc).format('0.00000000') } BTC</h5>
+              <h4>{ numeral(this.props.coin.usd).format('$0,0.0000') } { day }</h4>
+              <h5>{ (this.props.coin.btc !==null && this.props.coin.btc !== '' && this.props.coin.btc !== 0) ? this.props.coin.btc.toFixed(8) : 0 } BTC</h5>
               <div>
                 <GraphLineFull
                   color="#1991eb"
