@@ -64,3 +64,6 @@ config.js
 .DS_Store
 
 .vscode/
+
+#index html
+public/index.html
