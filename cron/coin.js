@@ -38,15 +38,15 @@ async function syncCoin() {
   //#       Fetch Data From CryptoBridge    #
   //#########################################
   let cb = await fetch("https://api.crypto-bridge.org/api/v1/ticker/CCBC_BTC");
-  console.log("BTC Price / Coin %s",cb.last);
-
 
   let market = {
     "USD_Price":cb.last * btc[0].price_usd,
-    "USD_Cap": cb.volume * btc[0].price_usd,
+    "USD_Cap": results[0].total * (cb.last * btc[0].price_usd),
+    "Suppply": results[0].total,
     "BTC_Price":cb.last,
-    "BTC_Volume":cb.volume
+    "BTC_Volume":results[0].total * cb.last
   };
+  console.log(market);
 
   const coin = new Coin({
     //cap: market.data.quotes.USD.market_cap || 0,
