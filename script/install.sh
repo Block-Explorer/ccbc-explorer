@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 installNodeAndYarn () {
     echo "Installing nodejs and yarn..."
