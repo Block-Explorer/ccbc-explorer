@@ -46,7 +46,7 @@ async function syncCoin() {
     "BTC_Price":cb.last,
     "BTC_Volume":results[0].total * cb.last
   };
-  console.log(market);
+  //console.log(market);
 
   const coin = new Coin({
     //cap: market.data.quotes.USD.market_cap || 0,
