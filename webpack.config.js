@@ -206,7 +206,8 @@ module.exports = {
   output: {
         filename: 'bundle.js',
         path: path.resolve('public'),
-        publicPath: '/'
+        publicPath: '/',
+        globalObject: 'this'
       },
   plugins: envPlugins,
     resolve: {
