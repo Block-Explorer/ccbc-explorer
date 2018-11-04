@@ -13,6 +13,7 @@ import {
 const promises = new Map();
 const worker = new fetchWorker();
 
+
 worker.onerror = (err) => {
   console.log(err);
   return err;
