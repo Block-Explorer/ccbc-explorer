@@ -103,56 +103,15 @@ const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
-
-// const basePlugins = [
-//   htmlPlugin,
-//   new webpack.EnvironmentPlugin({
-//     DEBUG: JSON.stringify(process.env.DEBUG || false),
-//     NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
-//     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-//   }),
-//   new webpack.HotModuleReplacementPlugin(),
-//   new webpack.NamedModulesPlugin(),
-//   new webpack.ProvidePlugin({
-//     Promise: 'bluebird'
-//   })
-// ];
-
-// HTML PLugin Related
-// Causes Faults
-const htmlPlugin = new htmlWebpackPlugin({
-  filename: 'index.html',
-  hash: true,
-  inject: 'body',
-  template: './client/template.html'
-});
-
-
-const basePlugins = [
-  htmlPlugin,
-  new webpack.EnvironmentPlugin({
-        DEBUG: JSON.stringify(process.env.DEBUG || false),
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-      }),
-  new webpack.HotModuleReplacementPlugin(),
-  new webpack.NamedModulesPlugin(),
-  new webpack.ProvidePlugin({
-        Promise: 'bluebird'
-      })
-];
-
-const envPlugins = process.env.NODE_ENV === 'production'
-  ? [...basePlugins, ...prodPlugins]
-  : basePlugins;
-
 
 
 module.exports = {
   optimization: {
     minimizer: [
-      new UglifyJsPlugin(),
+      new UglifyJsPlugin({
+      }),
       new CompressionPlugin({
         filename: "[path].gz[query]",
         algorithm: "gzip",
@@ -160,7 +119,8 @@ module.exports = {
         //threshold: 10240,
         //minRatio: 0.8
       })
-    ]
+    ],
+    runtimeChunk: false
   },
   devServer: {
         compress: true,
@@ -183,9 +143,9 @@ module.exports = {
           }
         }
       },
-      {
-        exclude: /(node_modules)/,
+      {     
         test: /\.jsx?$/,
+        exclude: /node_modules/,
         use: {
           loader:'babel-loader',
           options: {
@@ -209,7 +169,34 @@ module.exports = {
         publicPath: '/',
         globalObject: 'this'
       },
-  plugins: envPlugins,
+  plugins: [
+        new webpack.ContextReplacementPlugin(
+          /moment[/\\]locale$/,
+          /en/
+        ),
+        new webpack.DefinePlugin({
+          'process.env': {
+            'NODE_ENV': JSON.stringify('production')
+          }
+        }),
+       // new BundleAnalyzerPlugin(),
+        new htmlWebpackPlugin({
+          filename: 'index.html',
+          hash: true,
+          inject: 'body',
+          template: './client/template.html'
+        }),
+        new webpack.EnvironmentPlugin({
+              DEBUG: JSON.stringify(process.env.DEBUG || false),
+              NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+              'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+            }),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin(),
+        new webpack.ProvidePlugin({
+              Promise: 'bluebird'
+            }),
+  ],
     resolve: {
     extensions: ['.js', '.jsx'],
     modules: [
