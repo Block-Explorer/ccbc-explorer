@@ -44,14 +44,13 @@ const getseeds = async (req, res) => {
       res.json(outData);
     });
 
-},
+};
 
 const download = async (req, res) => {
-
   let index = 0;
   let date = new Date(Date.now()).toLocaleString();
   let returnstring = "##########################################\n";
-  returnstring += "#    ${config.dnsseed.coin} Add Nodes             #\n";
+  returnstring += "#    "+config.dnsseed.coin+ " Add Nodes             #\n";
   returnstring += "#  Generated :" + date + "      #\n";
   returnstring += "##########################################\n";
 
@@ -74,12 +73,12 @@ const download = async (req, res) => {
       }
     })
     .on('end', function () {
-      res.setHeader('Content-disposition', 'attachment; filename="${config.dnsseed.coin}.config"');
+      res.setHeader('Content-disposition', 'attachment; filename="' + config.dnsseed.coin + '.config"');
       res.setHeader('Content-type', 'text/plain');
-      res.status(200).send(data);
+      res.status(200).send(returnstring);
     });
 
-}
+};
 
 module.exports = {
   download,

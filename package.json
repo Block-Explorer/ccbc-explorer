@@ -26,6 +26,7 @@
     "test:web": "mocha --compilers js:babel-core/register ./test/client"
   },
   "dependencies": {
+    "split":"^1.0.1",
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.2",
     "body-parser": "^1.18.3",
@@ -56,6 +57,7 @@
     "redux": "^4.0.1"
   },
   "devDependencies": {
+    "split":"^1.0.1",
     "animate-sass": "^0.8.2",
     "babel-cli": "^6.26.0",
     "babel-loader": "^7.1.5",
