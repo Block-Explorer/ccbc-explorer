@@ -128,7 +128,7 @@ module.exports = {
         port: 8081,
         publicPath: '/'
       },
-  devtool: 'source-map',
+  devtool: 'eval-source-map',
   entry: ['babel-polyfill', './client/index.js'],
 
   module: {
@@ -176,7 +176,7 @@ module.exports = {
         ),
         new webpack.DefinePlugin({
           'process.env': {
-            'NODE_ENV': JSON.stringify('production')
+            'NODE_ENV': JSON.stringify('development')
           }
         }),
        //new BundleAnalyzerPlugin(),

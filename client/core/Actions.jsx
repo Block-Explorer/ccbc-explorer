@@ -91,6 +91,12 @@ export const getMNs = (query) => {
   });
 };
 
+export const getDnsseeds = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('seeds', resolve, reject, query);
+  });
+};
+
 export const getPeers = () => {
   return new promise((resolve, reject) => {
     return getFromWorker(
@@ -193,6 +199,7 @@ export default {
   getCoinsWeek,
   getIsBlock,
   getMNs,
+  getDnsseeds,
   getPeers,
   getSupply,
   getTop100,

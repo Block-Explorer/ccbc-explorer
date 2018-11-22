@@ -5,6 +5,9 @@ const config = require('../../config');
 
 
 const getseeds = async (req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+  
   let index = 0;
   let outData = [];
   let readStream = fs.createReadStream(config.dnsseed.path)
@@ -41,10 +44,12 @@ const getseeds = async (req, res) => {
       }
     })
     .on('end', function () {
-      res.json(outData);
+      const total = outData.length;
+      //res.json({ mns, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+      res.json({ seeds:outData.slice(skip, skip+limit) , pages: total <= limit ? 1 : Math.ceil(total / limit)});
     });
-
 };
+
 
 const download = async (req, res) => {
   let index = 0;

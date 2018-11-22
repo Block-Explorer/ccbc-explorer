@@ -18,6 +18,8 @@
     "start:maint": "NODE_ENV=production node ./server/maintenance.js",
     "win:api": "node ./server/index.js",
     "win:maint": "node ./server/maintenance.js",
+    "win:build": "webpack --progress --colors --config webpack_dev.config.js --mode development",
+    "win:web": "webpack-dev-server --colors --config webpack_dev.config.js --progress  --mode development",
     "start:web": "webpack-dev-server --progress --colors --mode development",
     "test:api": "mocha --compilers js:babel-core/register --timeout 2000 ./test/server/api",
     "test:file": "mocha --compilers js:babel-core/register --timeout 2000 ./test/server/file",
