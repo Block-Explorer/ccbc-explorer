@@ -14,6 +14,7 @@
     "cron:masternode": "node ./cron/masternode.js >> ./tmp/masternode.log",
     "cron:peer": "node ./cron/peer.js >> ./tmp/peer.log",
     "cron:rich": "node ./cron/rich.js >> ./tmp/rich.log",
+    "cron:seed": "node ./cron/seed.js >> ./tmp/seed.log",
     "start:api": "NODE_ENV=production node ./server/index.js",
     "start:maint": "NODE_ENV=production node ./server/maintenance.js",
     "win:api": "node ./server/index.js",
