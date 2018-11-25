@@ -10,18 +10,20 @@ const Peer = require('../model/peer');
 const Rich = require('../model/rich');
 const TX = require('../model/tx');
 const UTXO = require('../model/utxo');
+const Seed = require('../model/seed');
 
 /**
  * Clear database.
  */
 async function clearDatabase() {
-  await Block.remove({});
-  await Coin.remove({});
-  await Masternode.remove({});
-  await Peer.remove({});
-  await Rich.remove({});
-  await TX.remove({});
-  await UTXO.remove({});
+  await Block.deleteMany({});
+  await Coin.deleteMany({});
+  await Masternode.deleteMany({});
+  await Seed.deleteMany({});
+  await Peer.deleteMany({});
+  await Rich.deleteMany({});
+  await TX.deleteMany({});
+  await UTXO.deleteMany({});
 }
 
 /**
