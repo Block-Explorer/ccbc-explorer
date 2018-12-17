@@ -3,8 +3,8 @@ const MenuData = [
   {label: 'Movement', icon: '/img/movement.svg', href: '/movement'},
   {label: 'Top 100', icon: '/img/top100.svg', href: '/top'},
   {label: 'Masternode', icon: '/img/masternodes.svg', href: '/masternode'},
-  {label: 'Seedlist', icon: '/img/masternodes.svg', href: '/dnsseed'},
   {label: 'Connections', icon: '/img/connections.svg', href: '/peer'},
+  {label: 'Seedlist', icon: '/img/network.svg', href: '/dnsseed'},
   {label: 'Statistics', icon: '/img/statistics.svg', href: '/statistics'},
   {label: 'Coin Info', icon: '/img/coininfo.svg', href: '/coin'},
   {label: 'API', icon: '/img/api.svg', href: '/api'}
