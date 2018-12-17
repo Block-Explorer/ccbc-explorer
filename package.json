@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "split":"^1.0.1",
+    "react-google-charts":"^3.0.10",
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.2",
     "body-parser": "^1.18.3",
@@ -63,6 +64,7 @@
     "split":"^1.0.1",
     "animate-sass": "^0.8.2",
     "babel-cli": "^6.26.0",
+    "react-google-charts":"^3.0.10",
     "babel-loader": "^7.1.5",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
