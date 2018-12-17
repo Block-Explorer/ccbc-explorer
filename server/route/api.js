@@ -2,7 +2,7 @@
 const express = require('express');
 const blockex = require('../handler/blockex');
 const iquidus = require('../handler/iquidus');
-const dnsseeds = require('../handler/dnsseeds');
+const { getseedstats,getseeds } = require('../handler/dnsseeds');
 
 const router = express.Router();
 
@@ -35,6 +35,6 @@ router.get('/getrawtransaction', iquidus.getrawtransaction);
 router.get('/getnetworkhashps', iquidus.getnetworkhashps);
 
 // Get Dnsseeder Data
-router.get('/getseeds', dnsseeds.getseeds);
-router.get('/downloadseeds', dnsseeds.download);
+router.get('/getseeds', getseeds);
+router.get('/getseedstats', getseedstats);
 module.exports =  router;
