@@ -43,7 +43,9 @@ async function syncMasternode() {
   });
 
   if (inserts.length) {
-    await Masternode.insertMany(inserts);
+    await Masternode.insertMany(inserts).catch((error) => {
+      console.log(error.message);
+    });
   }
 }
 
