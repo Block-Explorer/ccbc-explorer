@@ -2,12 +2,11 @@
 import Actions from '../core/Actions';
 import Component from '../core/Component';
 import { connect } from 'react-redux';
-import { dateFormat } from '../../lib/date';
-import { Link } from 'react-router-dom';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import sortBy from 'lodash/sortBy';
+import numeral from 'numeral';
+import { Chart } from "react-google-charts";
 
 import HorizontalRule from '../component/HorizontalRule';
 import Pagination from '../component/Pagination';
@@ -26,21 +25,22 @@ class Dnsseed extends Component {
     this.debounce = null;
     this.state = {
       cols: [
-        { key: 'ipAddress', title: 'Node Address' },
-        { key: 'good', title: 'Node Status' },
-        { key: 'blockHeight', title: 'Block Height' },
-        { key: 'lastSuccess', title: 'Last Success' },
+        { key: 'ip', title: 'Node Address' },
+        { key: 'status', title: 'Node Status' },
+        { key: 'blockheight', title: 'Block Height' },
+        { key: 'lastScanned', title: 'Last Success' },
         { key: 'last_2_hours', title: 'Online 2 hours' },
         { key: 'last_8_hours', title: 'Online 8 hours' },
         { key: 'last_1_day', title: 'Online 1 day' },
         { key: 'last_7_days', title: 'Online 7 days' },
         { key: 'last_30_days', title: 'Online 30 days' },
-        { key: 'protocoll_version', title: 'Protocol' },
-        { key: 'version', title: 'Wallet Version' },
+        { key: 'protocol_version', title: 'Protocol' },
+        { key: 'wallet_version', title: 'Wallet Version' },
       ],
       error: null,
       loading: true,
-      seeds: [] ,
+      seeds: [],
+      stats: [],
       pages: 0,
       page: 1,
       size: 10
@@ -71,9 +71,9 @@ class Dnsseed extends Component {
             limit: this.state.size,
             skip: (this.state.page - 1) * this.state.size
           })
-          .then(({ seeds, pages }) => {
+          .then(({ seeds,stats, pages }) => {
             if (this.debounce) {
-              this.setState({ seeds, pages, loading: false });
+              this.setState({ seeds, pages, stats, loading: false });
             }
           })
           .catch(error => this.setState({ error, loading: false }));
@@ -95,46 +95,76 @@ class Dnsseed extends Component {
 
     const select = (
       <Select
-        onChange={ value => this.handleSize(value) }
-        selectedValue={ this.state.size }
-        options={ selectOptions } />
+        onChange={value => this.handleSize(value)}
+        selectedValue={this.state.size}
+        options={selectOptions} />
     );
+
+    let data  = this.state.stats.map(     
+      obj =>{ 
+        return [obj._id,obj.count];
+      });
+    data.unshift(["Country", "Popularity"])
 
 
     return (
       <div>
         <HorizontalRule
-          select={ select }
+          select={select}
           title="Dnsseeds" />
-        <Table
-          cols={ this.state.cols }
-          data={ sortBy(this.state.seeds.map((seed) => {
-            //const lastPaidAt = moment(seed.lastPaidAt).utc();
-            //const isEpoch = lastPaidAt.unix() === 0;
+        <Chart
+          chartEvents={[
+            {
+              eventName: "select",
+              callback: ({ chartWrapper }) => {
+                const chart = chartWrapper.getChart();
+                const selection = chart.getSelection();
+                if (selection.length === 0) return;
+                const region = data[selection[0].row + 1];
+              }
+            }
+          ]}
+          chartType="GeoChart"
+          width="100%"
+          height="400px"
+          data={data}
+          options={{
+            //region: '002', // Africa
+            colorAxis: { colors: ['#fff60a', '#ffb109', '#ff630a'] },
+            //backgroundColor: '#81d4fa',
+            datalessRegionColor: '#e1e7f2',
+            defaultColor: '#f5f5f5'
+          }}
+        />
 
+        <center><a href="/ext/downloadseeds">Download Current Seeds</a></center>
+
+        <Table
+          cols={this.state.cols}
+          data={sortBy(this.state.seeds.map((seed) => {
             return {
               ...seed,
-              // ip: seed.ip + ": PORT",
-              // status: seed.status
-              //active: moment().subtract(seed.active, 'seconds').utc().fromNow(),
-              // addr: (
-              //   <Link to={ `/address/${ seed.addr }` }>
-              //     { `${ seed.addr.substr(0, 20) }...` }
-              //   </Link>
-              // ),
-              //lastPaidAt: isEpoch ? 'N/A' : dateFormat(seed.lastPaidAt),
-              // txHash: (
-              //   <Link to={ `/tx/${ seed.txHash }` }>
-              //     { `${ seed.txHash.substr(0, 20) }...` }
-              //   </Link>
-              // )
+              ip: (
+                <div>
+                  <img
+                    className="flag"
+                    src={`/img/flag/${seed.countryCode ? seed.countryCode.toLowerCase() : 'xx'}.gif`}
+                    title={seed.country} /> {seed.ip}:{seed.port}
+                </div>
+              ),
+              status: (seed.status === 1) ? "OK" : "NOK",
+              last_2_hours: numeral(seed.last_2_hours).format('0,0.00')+" %",
+              last_8_hours: numeral(seed.last_8_hours).format('0,0.00')+" %",
+              last_1_day: numeral(seed.last_1_day).format('0,0.00')+" %",
+              last_7_days: numeral(seed.last_7_days).format('0,0.00')+" %",
+              last_30_days: numeral(seed.last_30_days).format('0,0.00')+" %"
             };
-          }), ['status']) } />
+          }), ['status'])} />
         <Pagination
-          current={ this.state.page }
+          current={this.state.page}
           className="float-right"
-          onPage={ this.handlePage }
-          total={ this.state.pages } />
+          onPage={this.handlePage}
+          total={this.state.pages} />
         <div className="clearfix" />
       </div>
     );
