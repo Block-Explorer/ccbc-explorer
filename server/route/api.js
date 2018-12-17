@@ -2,6 +2,7 @@
 const express = require('express');
 const blockex = require('../handler/blockex');
 const iquidus = require('../handler/iquidus');
+const { getseedstats,getseeds } = require('../handler/dnsseeds');
 
 const router = express.Router();
 
@@ -33,4 +34,7 @@ router.get('/getblock', iquidus.getblock);
 router.get('/getrawtransaction', iquidus.getrawtransaction);
 router.get('/getnetworkhashps', iquidus.getnetworkhashps);
 
+// Get Dnsseeder Data
+router.get('/getseeds', getseeds);
+router.get('/getseedstats', getseedstats);
 module.exports =  router;

@@ -13,6 +13,7 @@ import {
 const promises = new Map();
 const worker = new fetchWorker();
 
+
 worker.onerror = (err) => {
   console.log(err);
   return err;
@@ -87,6 +88,12 @@ export const getIsBlock = (query) => {
 export const getMNs = (query) => {
   return new promise((resolve, reject) => {
     return getFromWorker('mns', resolve, reject, query);
+  });
+};
+
+export const getDnsseeds = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('seeds', resolve, reject, query);
   });
 };
 
@@ -192,6 +199,7 @@ export default {
   getCoinsWeek,
   getIsBlock,
   getMNs,
+  getDnsseeds,
   getPeers,
   getSupply,
   getTop100,

@@ -57,7 +57,7 @@ async function vout(rpctx, blockHeight) {
       txout.push(to);
       utxo.push({
         ...to,
-        _id: `${ rpctx.txid }:${ vout.n }`,
+        _id: `${ rpctx.txid }:${ blockHeight }:${ vout.n }`, 
         txId: rpctx.txid
       });
     });

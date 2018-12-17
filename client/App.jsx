@@ -25,6 +25,7 @@ import PoS from './container/PoS';
 import Statistics from './container/Statistics';
 import Top100 from './container/Top100';
 import TX from './container/TX';
+import Dnsseed from './container/Dnsseed';
 
 // Layout
 import CoinSummary from './container/CoinSummary';
@@ -169,6 +170,7 @@ class App extends Component {
                   <Route exact path="/faq" component={ FAQ } />
                   <Route exact path="/masternode" component={ Masternode } />
                   <Route exact path="/movement" component={ Movement } />
+                  <Route exact path="/dnsseed" component={ Dnsseed } />
                   <Route exact path="/peer" component={ Peer } />
                   <Route exact path="/pos/:amount" component={ PoS } />
                   <Route exact path="/statistics" component={ Statistics } />

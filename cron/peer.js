@@ -46,7 +46,7 @@ async function syncPeer() {
   });
 
   if (inserts.length) {
-    await Peer.remove({});
+    await Peer.deleteMany({});
     await Peer.insertMany(inserts);
   }
 }
