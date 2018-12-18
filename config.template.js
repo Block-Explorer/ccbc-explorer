@@ -30,7 +30,15 @@ const config = {
     'user': 'bulwarkrpc',
     'pass': 'someverysafepassword',
     'timeout': 8000, // 8 seconds
-  }
+  },
+  'dnsseed': {
+    'path' : './data/seeds/dnsseed.dump',
+    'coin' : 'ccbc'
+  },
+  'burnAddress':[
+    {'label':'CryptoCashBack Burn Address','address':'SbUrNmfY8pfDVLNtXsedwLTz1QY481hEBn','comment':'Burned Supply from Developmen Team, these coins are lost'},
+    {'label':'CryptoCashBack Burn Address','address':'SNAJtneSvRhW14Db7ZsbXVwRcABTAPKnT3','comment':'Burned Supply from Developmen Team, these coins are lost'}
+  ]
 };
 
 module.exports = config;
