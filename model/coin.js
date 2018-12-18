@@ -11,6 +11,7 @@ const Coin = mongoose.model('Coin', new mongoose.Schema({
   blocks: { required: true, type: Number },
   btc: { required: true, type: Number },
   cap: { required: true, type: Number },
+  burned: { required: true, type: Number },
   createdAt: { index: true, required: true, type: Date },
   diff: { required: true, type: Number },
   mnsOff: { required: true, type: Number },

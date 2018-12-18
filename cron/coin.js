@@ -31,6 +31,15 @@ async function syncCoin() {
   ]);
 
   //#########################################
+  //#     Get current Burned Coins          #
+  //#########################################
+  const BurnAddress = await UTXO.aggregate([
+    { "$match": { "address": { $in: config.burnAddress.map(obj => {return obj.address}) } } },
+    { $group: { _id: 'burned', sum: { $sum: '$value' } } },
+  ]);
+
+
+  //#########################################
   //#     Get Current BTC $$$ Price         #
   //#########################################
   let btc = await fetch("https://api.coinmarketcap.com/v1/ticker/bitcoin/?convert=btc");
@@ -49,12 +58,13 @@ async function syncCoin() {
   //console.log(market);
 
   const coin = new Coin({
+    burned: BurnAddress[0]!==null ? BurnAddress[0].sum : 0,
     //cap: market.data.quotes.USD.market_cap || 0,
-	cap: market.USD_Cap !== null ? market.USD_Cap : 0,
+  	cap: market.USD_Cap !== null ? market.USD_Cap : 0,
     createdAt: date,
     blocks: info.blocks,
     //btc: market.data.quotes.BTC.price,
-	btc: market.BTC_Price !== null ? market.BTC_Price : 0,
+	  btc: market.BTC_Price !== null ? market.BTC_Price : 0,
     diff: info.difficulty,
     mnsOff: masternodes.total - masternodes.stable,
     mnsOn: masternodes.stable,
