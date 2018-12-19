@@ -46,7 +46,9 @@ class Top100 extends Component {
           data={ this.state.wallets.map((wallet, idx) => ({
             ...wallet,
             address: (
-              <Link to={ `/address/${ wallet.address }` }>{ wallet.address }</Link>
+              <Link to={ `/address/${ wallet.address }` }>{ wallet.address }
+            {(wallet.label) ? <span class="wallet_comment">({wallet.label})</span>: ""}
+              </Link>
             ),
             index: idx + 1,
             percent: numeral((wallet.value / this.props.coin.supply) * 100.0).format('0,0.00'),

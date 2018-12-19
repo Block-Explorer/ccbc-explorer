@@ -2,9 +2,22 @@
 require('babel-polyfill');
 const { exit } = require('../lib/cron');
 const locker = require('../lib/locker');
+const config = require('../config');
 // Models.
 const Rich = require('../model/rich');
 const UTXO = require('../model/utxo');
+
+//Filter Labels
+function findlabel(address)
+{
+  const burnAddress = config.burnAddress.filter( x => (x.address == address))
+  if(burnAddress[0]) return burnAddress[0].label
+
+  const label = config.label.filter( x => (x.address == address))
+  if(label[0]) return label[0].label
+  
+  return "";
+}
 
 /**
  * Build the list of rich addresses from
@@ -19,7 +32,11 @@ async function syncRich() {
     { $limit: 100 }
   ]);
 
-  await Rich.insertMany(addresses.map(addr => ({
+
+
+  await Rich.insertMany(addresses.map(addr => (
+    {
+    label: findlabel(addr._id),
     address: addr._id,
     value: addr.sum
   })));
