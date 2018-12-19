@@ -9,6 +9,11 @@ const moment = require('moment');
 const Coin = require('../model/coin');
 const UTXO = require('../model/utxo');
 
+// function Exchange()
+// {
+//   switch()
+// }
+
 /**
  * Get the coin related information including things
  * like price coinmarketcap.com data.
@@ -16,55 +21,61 @@ const UTXO = require('../model/utxo');
 async function syncCoin() {
   const date = moment().utc().startOf('minute').toDate();
   //#########################################
+  //#     Get Current BTC $$$ Price         #
+  //#########################################
+  const btc_q = await fetch("https://api.coinmarketcap.com/v1/ticker/bitcoin/?convert=btc");
+  //#########################################
+  //#       Fetch Data From Exchange        #
+  //#########################################
+  const cb_q = await fetch("https://api.crypto-bridge.org/api/v1/ticker/CCBC_BTC");
+  //#########################################
   //#     Coin Market Cap Wait for List     #
   //#########################################
-  // Setup the coinmarketcap.com api url.
-  // const url = `${ config.coinMarketCap.api }${ config.coinMarketCap.ticker }?convert=BTC`;
-  // let market = await fetch(url);
+  const info_q = await rpc.call('getinfo');
+  const masternodes_q = await rpc.call('getmasternodecount');
+  const nethashps_q = await rpc.call('getnetworkhashps');
 
-  const info = await rpc.call('getinfo');
-  const masternodes = await rpc.call('getmasternodecount');
-  const nethashps = await rpc.call('getnetworkhashps');
-
-  const results = await UTXO.aggregate([
+  const results_q = await UTXO.aggregate([
     { $group: { _id: 'supply', total: { $sum: '$value' } } }
   ]);
+
+  // we want these Queries to run parallel
+  const info = await info_q
+  const masternodes =await masternodes_q 
+  const nethashps =await nethashps_q
+  const results =await results_q 
+  const btc = await btc_q
+  const cb = await cb_q
 
   //#########################################
   //#     Get current Burned Coins          #
   //#########################################
-  const BurnAddress = await UTXO.aggregate([
-    { "$match": { "address": { $in: config.burnAddress.map(obj => {return obj.address}) } } },
-    { $group: { _id: 'burned', sum: { $sum: '$value' } } },
-  ]);
+  let burned = 0
+  if (config.module.burnAddress.active) {
+    const BurnAddress = await UTXO.aggregate([
+      { "$match": { "address": { $in: config.module.burnAddress.address.map(obj => { return obj.address }) } } },
+      { $group: { _id: 'burned', sum: { $sum: '$value' } } },
+    ]);
+    if (BurnAddress[0] !== null)  burned = BurnAddress[0].sum
+  }
 
-
-  //#########################################
-  //#     Get Current BTC $$$ Price         #
-  //#########################################
-  let btc = await fetch("https://api.coinmarketcap.com/v1/ticker/bitcoin/?convert=btc");
-  //#########################################
-  //#       Fetch Data From CryptoBridge    #
-  //#########################################
-  let cb = await fetch("https://api.crypto-bridge.org/api/v1/ticker/CCBC_BTC");
+  
 
   let market = {
-    "USD_Price":cb.last * btc[0].price_usd,
+    "USD_Price": cb.last * btc[0].price_usd,
     "USD_Cap": results[0].total * (cb.last * btc[0].price_usd),
     "Suppply": results[0].total,
-    "BTC_Price":cb.last,
-    "BTC_Volume":results[0].total * cb.last
+    "BTC_Price": cb.last,
+    "BTC_Volume": results[0].total * cb.last
   };
   //console.log(market);
 
   const coin = new Coin({
-    burned: BurnAddress[0]!==null ? BurnAddress[0].sum : 0,
-    //cap: market.data.quotes.USD.market_cap || 0,
-  	cap: market.USD_Cap !== null ? market.USD_Cap : 0,
+    burned: burned,
+    cap: market.USD_Cap !== null ? market.USD_Cap : 0,
     createdAt: date,
     blocks: info.blocks,
-    //btc: market.data.quotes.BTC.price,
-	  btc: market.BTC_Price !== null ? market.BTC_Price : 0,
+    btc: market.BTC_Price !== null ? market.BTC_Price : 0,
     diff: info.difficulty,
     mnsOff: masternodes.total - masternodes.stable,
     mnsOn: masternodes.stable,
@@ -74,7 +85,7 @@ async function syncCoin() {
     //supply: results.length ? results[0].total : market.data.circulating_supply || market.data.total_supply,
     supply: results.length ? results[0].total : 0,
     //usd: market.data.quotes.USD.price
-	usd: market.USD_Price !== null ? market.USD_Price : 0
+    usd: market.USD_Price !== null ? market.USD_Price : 0
 
   });
 
@@ -91,13 +102,13 @@ async function update() {
   try {
     locker.lock(type);
     await syncCoin();
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     code = 1;
   } finally {
     try {
       locker.unlock(type);
-    } catch(err) {
+    } catch (err) {
       console.log(err);
       code = 1;
     }

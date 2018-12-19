@@ -47,7 +47,7 @@ class Top100 extends Component {
             ...wallet,
             address: (
               <Link to={ `/address/${ wallet.address }` }>{ wallet.address }
-            {(wallet.label) ? <span class="wallet_comment">({wallet.label})</span>: ""}
+            {(wallet.label) ? <span className="wallet_comment">({wallet.label})</span>: ""}
               </Link>
             ),
             index: idx + 1,
