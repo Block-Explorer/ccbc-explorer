@@ -8,14 +8,18 @@ const Rich = require('../model/rich');
 const UTXO = require('../model/utxo');
 
 //Filter Labels
-function findlabel(address)
-{
-  const burnAddress = config.burnAddress.filter( x => (x.address == address))
-  if(burnAddress[0]) return burnAddress[0].label
+function findlabel(address) {
+  //If Burned Addresses are Activ check for the label
+  if (config.module.burnAddress.active) {
+    const burnAddress = config.module.burnAddress.address.filter(x => (x.address == address))
+    if (burnAddress[0]) return burnAddress[0].label
+  }
+  //If Wallet Labels are Activ check for the label
+  if (config.module.AddressLabel.active) {
+    const label = config.module.AddressLabel.label.filter(x => (x.address == address))
+    if (label[0]) return label[0].label
+  }
 
-  const label = config.label.filter( x => (x.address == address))
-  if(label[0]) return label[0].label
-  
   return "";
 }
 
@@ -36,10 +40,10 @@ async function syncRich() {
 
   await Rich.insertMany(addresses.map(addr => (
     {
-    label: findlabel(addr._id),
-    address: addr._id,
-    value: addr.sum
-  })));
+      label: findlabel(addr._id),
+      address: addr._id,
+      value: addr.sum
+    })));
 }
 
 /**
@@ -52,13 +56,13 @@ async function update() {
   try {
     locker.lock(type);
     await syncRich();
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     code = 1;
   } finally {
     try {
       locker.unlock(type);
-    } catch(err) {
+    } catch (err) {
       console.log(err);
       code = 1;
     }

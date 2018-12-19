@@ -35,13 +35,21 @@ const config = {
     'path' : './data/seeds/dnsseed.dump',
     'coin' : 'ccbc'
   },
-  'burnAddress':[
-    {'label':'CryptoCashBack Burn Address','address':'SbUrNmfY8pfDVLNtXsedwLTz1QY481hEBn','comment':'Burned Supply from Developmen Team, these coins are lost'},
-    {'label':'CryptoCashBack Burn Address','address':'SNAJtneSvRhW14Db7ZsbXVwRcABTAPKnT3','comment':'Burned Supply from Developmen Team, these coins are lost'}
-  ],
-  'label':[
-    {'label':'Rich Filthy Bastard....','address':'SddsBnNUsabrs2xjEUx63PsmZe2XsKghHK','comment':'Just another Gready Guy'},
-  ]
+  'module':
+  {
+    'burnAddress': {
+      'active': true,
+      'address': [
+        { 'label': 'CryptoCashBack Burn Address', 'address': 'SbUrNmfY8pfDVLNtXsedwLTz1QY481hEBn', 'comment': 'Burned Supply from Development Team, these coins are lost' }
+      ],
+    },
+    'AddressLabel': {
+      'active': true,
+      'label': [
+        { 'label': 'Rich Filthy Bastard....', 'address': 'SddsBnNUsabrs2xjEUx63PsmZe2XsKghHK', 'comment': 'Just another Gready Guy' },
+      ]
+    }
+  },
 };
 
 module.exports = config;
