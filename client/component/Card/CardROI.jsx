@@ -32,7 +32,7 @@ const CardROI = ({ coin, supply }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(supply ? supply.t : 0.0).format('0,0.0000') } CCBC
+          { numeral(supply ? supply.total_supply : 0.0).format('0,0.0000') } CCBC
         </div>
         <div className="h5">
           Coin Supply (Total)
@@ -40,7 +40,7 @@ const CardROI = ({ coin, supply }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(supply ? supply.c - (mns * mncoins) : 0.0).format('0,0.0000') } CCBC
+          { numeral(supply ? supply.circulation_supply : 0.0).format('0,0.0000') } CCBC
         </div>
         <div className="h5">
           Coin Supply (Circulating)
@@ -51,7 +51,7 @@ const CardROI = ({ coin, supply }) => {
           {/*I think this is wrong coin cap is usd and coim/btc is price /coin and 
           not bitcoins current price which make the math incorrect
           numeral(coin.cap * coin.btc).format('0,0.00000000') */} 
-          {numeral(supply.c  * coin.btc).format('0,0.00') }BTC
+          {numeral(supply.circulation_supply  * coin.btc).format('0,0.00') }BTC
         </div>
         <div className="h5">
           Market Cap BTC
@@ -73,6 +73,16 @@ const CardROI = ({ coin, supply }) => {
           Coins Locked
         </div>
       </div>
+      {(supply.burned_coins > 0) ? (
+      <div className="mb-3">
+        <div className="h3 text-red"> 
+          { numeral(supply.burned_coins ).format('0,0.0000') } CCBC
+        </div>
+        <div className="h5">
+          Burned Coins (Untouchable)
+        </div>
+      </div>
+      ):null}
       <div className="mb-3">
         <div className="h3">
           { numeral(mncoins * coin.btc).format('0,0.00000000') } BTC / { numeral(mncoins * coin.usd).format('$0,0.00') }
