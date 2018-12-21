@@ -21,7 +21,17 @@ const Block = mongoose.model('Block', new mongoose.Schema({
   next: { required: false, type: String }, // The next block 
   size: { type: Number },
   txs: { default: [], required: true, type: [String] },
-  ver: { required: true, type: Number }
+  ver: { required: true, type: Number },
+  moneysupply:  { required: false, type: Number }, // This is Optional to some wallets  like PIVX
 }, { versionKey: false }), 'blocks');
 
 module.exports =  Block;
+/**
+ * Added Next Block - This will cause issue on the last block synced 
+ * since it does not have next block value yet in order to fix it we have to make sure we update that
+ * block on scan
+ * 
+ * supply:
+ * The Value moneysupply has been added in the PIVX Wallets 
+ * This keeps track of the curent supply in the Wallets
+ */
