@@ -35,10 +35,12 @@ async function syncBlocks(start, stop, clean = false) {
       diff: rpcblock.difficulty,
       merkle: rpcblock.merkleroot,
       nonce: rpcblock.nonce,
-      prev: rpcblock.prevblockhash ? rpcblock.prevblockhash : 'GENESIS',
+      prev: (rpcblock.height == 1) ? 'GENESIS' : (rpcblock.previousblockhash) ? rpcblock.previousblockhash : 'UNKNOWN',
+      next: rpcblock.nextblockhash ? rpcblock.nextblockhash : 'TOBEDETERMINED',
       size: rpcblock.size,
       txs: rpcblock.tx ? rpcblock.tx : [],
-      ver: rpcblock.version
+      ver: rpcblock.version,
+      moneysupply: rpcblock.moneysupply ? rpcblock.moneysupply : 0,
     });
 //console.log(`Block Object: ${ block }`);
     
