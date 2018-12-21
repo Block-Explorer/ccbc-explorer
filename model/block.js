@@ -18,6 +18,7 @@ const Block = mongoose.model('Block', new mongoose.Schema({
   merkle: { required: true, type: String },
   nonce: { required: true, type: Number },
   prev: { required: true, type: String },
+  next: { required: false, type: String }, // The next block 
   size: { type: Number },
   txs: { default: [], required: true, type: [String] },
   ver: { required: true, type: Number }
