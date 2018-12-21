@@ -22,6 +22,17 @@ async function syncBlocks(start, stop, clean = false) {
     await UTXO.remove({ blockHeight: { $gte: start, $lte: stop } });
   }
 
+  //Check if the last Block has a Nextblock Field or not if not we need to update it
+  const lastblock = start - 1
+  const lastblock_hash = await rpc.call('getblockhash', [lastblock]);
+  const lastblock_rpcblock = await rpc.call('getblock', [lastblock_hash]);
+
+  await Block.findOneAndUpdate(
+    { height: lastblock }, //This is the Search Field
+    { next: lastblock_rpcblock.nextblockhash ? lastblock_rpcblock.nextblockhash : 'TOBEDETERMINED'  }, //This is the Replacement Field
+    { runValidators: true})// validate before update
+
+
   for(let height = start; height <= stop; height++) {
     const hash = await rpc.call('getblockhash', [height]);
     const rpcblock = await rpc.call('getblock', [hash]);
