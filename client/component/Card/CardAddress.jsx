@@ -10,6 +10,8 @@ export default class CardAddress extends Component {
   static defaultProps = {
     address: '',
     balance: 0.0,
+    label: '',
+    comment: 'test',
     received: 0.0,
     txs: [],
     utxo: []
@@ -17,6 +19,8 @@ export default class CardAddress extends Component {
 
   static propTypes = {
     address: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    comment: PropTypes.string.isRequired,
     balance: PropTypes.number.isRequired,
     received: PropTypes.number.isRequired,
     txs: PropTypes.array.isRequired,
@@ -59,12 +63,34 @@ export default class CardAddress extends Component {
                 { this.props.address }
               </span>
             </div>
+            {
+              (this.props.label)?
+              <div className="card__row">
+              <span className="card__label">
+                Label :
+              </span>
+              <span className="card__result">
+                {this.props.label}
+              </span>
+            </div>:null
+            }
+            {
+            (this.props.comment)?
+            <div className="card__row">
+            <span className="card__label">
+              Comment :
+            </span>
+            <span className="card__result">
+              {this.props.comment}
+            </span>
+            </div>:null}
+
             <div className="card__row">
               <span className="card__label">
                 Sent:
               </span>
               <span className="card__result">
-                -{ numeral(this.props.received - this.props.balance).format('0,0.0000') } CCBC
+                { numeral(this.props.balance - this.props.received ).format('0,0.0000') } CCBC
               </span>
             </div>
             <div className="card__row">
