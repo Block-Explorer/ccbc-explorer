@@ -18,11 +18,11 @@ const Block = mongoose.model('Block', new mongoose.Schema({
   merkle: { required: true, type: String },
   nonce: { required: true, type: Number },
   prev: { required: true, type: String },
-  next: { required: false, type: String }, // The next block 
+  next: { required: true, type: String }, // The next block 
   size: { type: Number },
   txs: { default: [], required: true, type: [String] },
   ver: { required: true, type: Number },
-  moneysupply:  { required: false, type: Number }, // This is Optional to some wallets  like PIVX
+  moneysupply:  { required: true, type: Number }, // This is Optional to some wallets  like PIVX
 }, { versionKey: false }), 'blocks');
 
 module.exports =  Block;
