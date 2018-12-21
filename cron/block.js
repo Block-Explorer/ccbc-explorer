@@ -33,6 +33,7 @@ async function syncBlocks(start, stop, clean = false) {
       confirmations: rpcblock.confirmations,
       createdAt: new Date(rpcblock.time * 1000),
       diff: rpcblock.difficulty,
+      chainwork: rpcblock.chainwork,
       merkle: rpcblock.merkleroot,
       nonce: rpcblock.nonce,
       prev: (rpcblock.height == 1) ? 'GENESIS' : (rpcblock.previousblockhash) ? rpcblock.previousblockhash : 'UNKNOWN',
