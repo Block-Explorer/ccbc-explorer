@@ -5,10 +5,15 @@ const { exit, rpc } = require('../lib/cron');
 const { forEachSeries } = require('p-iteration');
 const locker = require('../lib/locker');
 const util = require('./util');
+const config = require ('../config')
+//const utiln = require('util')
 // Models.
 const Block = require('../model/block');
 const TX = require('../model/tx');
 const UTXO = require('../model/utxo');
+
+const coin = "z"+config.coin.toUpperCase()+"supply" // Prefix for Zerocoin
+
 
 /**
  * Process the blocks and transactions.
@@ -16,22 +21,26 @@ const UTXO = require('../model/utxo');
  * @param {Number} stop The current block height at the tip of the chain.
  */
 async function syncBlocks(start, stop, clean = false) {
+  console.log(`Current Block: ${start} - Stop Block: ${stop}`)
+  //This makes sure that there is no data for the blocks we are about to scan
   if (clean) {
-    await Block.remove({ height: { $gte: start, $lte: stop } });
-    await TX.remove({ blockHeight: { $gte: start, $lte: stop } });
-    await UTXO.remove({ blockHeight: { $gte: start, $lte: stop } });
+    await Block.deleteMany({ height: { $gte: start, $lte: stop } });
+    await TX.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
+    await UTXO.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
   }
 
   //Check if the last Block has a Nextblock Field or not if not we need to update it
+  if(start > 1){
   const lastblock = start - 1
   const lastblock_hash = await rpc.call('getblockhash', [lastblock]);
   const lastblock_rpcblock = await rpc.call('getblock', [lastblock_hash]);
+ 
 
   await Block.findOneAndUpdate(
     { height: lastblock }, //This is the Search Field
-    { next: lastblock_rpcblock.nextblockhash ? lastblock_rpcblock.nextblockhash : 'TOBEDETERMINED'  }, //This is the Replacement Field
+    { nextblockhash: lastblock_rpcblock.nextblockhash ? lastblock_rpcblock.nextblockhash : 'TOBEDETERMINED'  }, //This is the Replacement Field
     { runValidators: true})// validate before update
-
+  }else console.log(`Lastblock Check Skipped ${start}`)
 
   for(let height = start; height <= stop; height++) {
     const hash = await rpc.call('getblockhash', [height]);
@@ -39,41 +48,51 @@ async function syncBlocks(start, stop, clean = false) {
 
     const block = new Block({
       hash,
-      height,
-      bits: rpcblock.bits,
       confirmations: rpcblock.confirmations,
-      createdAt: new Date(rpcblock.time * 1000),
-      diff: rpcblock.difficulty,
-      chainwork: rpcblock.chainwork,
-      merkle: rpcblock.merkleroot,
-      nonce: rpcblock.nonce,
-      prev: (rpcblock.height == 1) ? 'GENESIS' : (rpcblock.previousblockhash) ? rpcblock.previousblockhash : 'UNKNOWN',
-      next: rpcblock.nextblockhash ? rpcblock.nextblockhash : 'TOBEDETERMINED',
-      size: rpcblock.size,
+      size: rpcblock.size,  
+      height,
+      version: rpcblock.version,
+      merkleroot: rpcblock.merkleroot,
+      acc_checkpoint : (typeof rpcblock.acc_checkpoint !== 'undefined') ? rpcblock.acc_checkpoint : null,
       txs: rpcblock.tx ? rpcblock.tx : [],
-      ver: rpcblock.version,
+      time:new Date(rpcblock.time * 1000),
+      createdAt: new Date(rpcblock.time * 1000), //TODO: Remove this see model Block
+      nonce: rpcblock.nonce,
+      bits: rpcblock.bits, 
+      difficulty: rpcblock.difficulty,
+      chainwork: rpcblock.chainwork,
+      previousblockhash: (rpcblock.height == 1) ? 'GENESIS' : (rpcblock.previousblockhash) ? rpcblock.previousblockhash : 'UNKNOWN',
+      nextblockhash: rpcblock.nextblockhash ? rpcblock.nextblockhash : 'TOBEDETERMINED',
       moneysupply: rpcblock.moneysupply ? rpcblock.moneysupply : 0,
+      zerosupply : (typeof rpcblock[coin] !== 'undefined') ? rpcblock[coin] : null,
+      value_in :0,  //TODO: Implement Value Incomming (This needs to be done after everything Syncs OK)  
+      value_out :0, //TODO: Implement Value Outcomming Spent (This needs to be done after everything Syncs OK)  
+      value_fee :0, //TODO: Implement Value Fees (This needs to be done after everything Syncs OK)  
+      value_reward:0,
+      type: "unknown" //TODO: Add Types
     });
-//console.log(`Block Object: ${ block }`);
+
     
-
-   // console.log(`Saving BLock: ${ block.height  }`);
-    await block.save();
-
-    //console.log(`BLock Saved: ${ block.height  }`);
-    await forEachSeries(block.txs, async (txhash) => {
+    await forEachSeries(block.txs, async (txhash ,index) => {
       const rpctx = await util.getTX(txhash);
 
-      if (blockchain.isPoS(block)) {
-       // console.log(`Add POS BLock: ${ block.height  } RPX: ${rpctx}`);
-        await util.addPoS(block, rpctx);
-      } else {
-       // console.log(`Add POW BLock: ${ block.height  } RPX: ${rpctx}`);
-        //console.log(rpctx);
-        await util.addPoW(block, rpctx);
-      }
+      const feedback = await util.AddTransaction(block, index, rpctx);
+      //console.log(feedback)
+      if(block.type == 'unknown')
+      block.type = feedback.type
+      block.value_in += feedback.value_in
+      block.value_out += feedback.value_out
+      block.value_fee += feedback.value_fee
+      
     });
 
+    block.value_reward = parseFloat(block.value_out -  block.value_in + block.value_fee).toFixed(8)
+    //console.log(block)
+
+    await block.save().catch((error) => {
+      console.log(error.message);
+    });
+    console.log(`BLock Saved: ${ block.height  }`);
     console.log(`Height: ${ block.height } Hash: ${ block.hash }`);
   }
 }
@@ -107,6 +126,7 @@ async function update() {
     if (dbHeight >= rpcHeight) {
       return;
     }
+
     // If starting from genesis skip.
     else if (dbHeight === 0) {
       dbHeight = 1;
@@ -114,6 +134,8 @@ async function update() {
 
     locker.lock(type);
     await syncBlocks(dbHeight, rpcHeight, clean);
+  //await syncBlocks(2115, 2115, clean);
+   //await syncBlocks(1, 1, clean);
   } catch(err) {
     console.log(err);
     code = 1;
