@@ -120,8 +120,8 @@ const APIdata = [
         },
         {
           name: 'getBalance',
-          info: 'Returns the current balance.',
-          path: '/ext/getbalance'
+          info: 'Returns the current balance. Of the Entered Address',
+          path: '/ext/getbalance/SRDMYhdmnmMPjRfrLFt4zNQjD9hThKCXHY'
         },
         {
           name: 'getLastTXs',
