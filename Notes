@@ -1,0 +1,28 @@
+///Performance increase
+
+//Handler iquidus:
+    //Old Query
+    const utxo = await UTXO.find({ address: req.params.hash });
+        let bal = 0.0;
+        utxo.forEach(tx => bal += tx.value);
+        res.json(bal);
+
+    //Query result GET /ext/getbalance/SRDMYhdmnmMPjRfrLFt4zNQjD9hThKCXHY 304 395.775 ms - -
+
+    //New Query
+    const bal = await UTXO.aggregate([
+      { "$match": { address:  req.params.hash} },
+      { $group: { _id: '$address', sum: { $sum: '$value' } } },
+    ]);
+    res.json(bal[0].sum);
+    // GET /ext/getbalance/SRDMYhdmnmMPjRfrLFt4zNQjD9hThKCXHY 304 141.882 ms - -
+
+
+//blockex.js Wallet Request
+GET /api/address/SbUrNmfY8pfDVLNtXsedwLTz1QY481hEBn? 200 1243.049 ms - 174002
+GET /api/address/SbUrNmfY8pfDVLNtXsedwLTz1QY481hEBn? 200 4198.916 ms - 174002
+
+Run Parralel Query
+
+GET /api/address/SbuJLbL4vKgRQS76QXNxcVWAZd7v5jbCrh? 200 855.813 ms - 598337
+GET /api/address/SYKNf9to4sJ9Xfe8smBLrm4ykWvPjoysc8? 200 799.181 ms - 478540
