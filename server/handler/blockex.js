@@ -3,7 +3,6 @@ const chain = require('../../lib/blockchain');
 const { forEach } = require('p-iteration');
 const moment = require('moment');
 const { rpc } = require('../../lib/cron');
-
 // System models for query and etc.
 const Block = require('../../model/block');
 const Coin = require('../../model/coin');
@@ -12,6 +11,7 @@ const Peer = require('../../model/peer');
 const Rich = require('../../model/rich');
 const TX = require('../../model/tx');
 const UTXO = require('../../model/utxo');
+const config = require('../../config');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -20,26 +20,70 @@ const UTXO = require('../../model/utxo');
  */
 const getAddress = async (req, res) => {
   try {
-    const txs = await TX
+    // const txs_q1 = TX
+    //   .aggregate([
+    //     { $match: { 'vout.address': req.params.hash } },
+    //     { $sort: { blockHeight: -1 } }
+    //   ])
+    //   .allowDiskUse(true)
+    //   .exec();
+    const txs_q1 = TX
+    .aggregate([
+      {$match: { 'vout.address': req.params.hash } },
+      {$project: {
+      vout: {$filter: {
+          input: '$vout',
+          as: 'v',
+          cond: {$eq: ['$$v.address', req.params.hash]}
+      }},
+      _id:1,
+      blockHash:1,
+      blockHeight:1,
+      createdAt:1,
+      txId:1,
+      version:1,
+      vin:1,
+    }},
+    { $sort: { blockHeight: -1 } }
+    ])
+      .allowDiskUse(true)
+      .exec();
+
+    const utxo_q2 = UTXO
       .aggregate([
-        { $match: { 'vout.address': req.params.hash } },
+        { $match: { address: req.params.hash } },
         { $sort: { blockHeight: -1 } }
       ])
       .allowDiskUse(true)
       .exec();
-    const utxo = await UTXO
-      .aggregate([
-          { $match: { address: req.params.hash } },
-          { $sort: { blockHeight: -1 } }
-      ])
-      .allowDiskUse(true)
-      .exec();
+
+    let label = ""
+    let comment =""
+
+    if (config.module.burnAddress.active) {
+      const label_q = config.module.burnAddress.address.filter(x => (x.address == req.params.hash))
+      if (label_q[0]) {
+        label = label_q[0].label
+        comment = label_q[0].comment
+      } 
+    }
+
+    if (config.module.AddressLabel.active) {
+      const label_q = config.module.AddressLabel.label.filter(x => (x.address == req.params.hash))
+      if (label_q[0]) {
+        label = label_q[0].label
+        comment = label_q[0].comment
+      } 
+    }
+
+    const txs = await txs_q1;
+    const utxo = await utxo_q2;
 
     const balance = utxo.reduce((acc, tx) => acc + tx.value, 0.0);
     const received = txs.reduce((acc, tx) => acc + tx.vout.reduce((a, t) => a + t.value, 0.0), 0.0);
 
-    res.json({ balance, received, txs, utxo });
-  } catch(err) {
+    res.json({ balance, label, comment, received, txs, utxo });
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -68,7 +112,7 @@ const getAvgBlockTime = () => {
 
       cache = seconds / blocks.length;
       cutOff = moment().utc().add(60, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       if (!cache) {
@@ -117,7 +161,7 @@ const getAvgMNTime = () => {
 
       cache = (24.0 / (blocks.length / mns.length));
       cutOff = moment().utc().add(5, 'minutes').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       if (!cache) {
@@ -159,10 +203,10 @@ const getBlock = async (req, res) => {
       return;
     }
 
-    const txs = await TX.find({ txId: { $in: block.txs }});
+    const txs = await TX.find({ txId: { $in: block.txs } });
 
     res.json({ block, txs });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -233,7 +277,7 @@ const getCoinsWeek = () => {
 
       cache = await Coin.aggregate(qry);
       cutOff = moment().utc().add(90, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       loading = false;
@@ -271,7 +315,7 @@ const getIsBlock = async (req, res) => {
     }
 
     res.json(isBlock);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -290,7 +334,7 @@ const getMasternodes = async (req, res) => {
     const mns = await Masternode.find().skip(skip).limit(limit).sort({ lastPaidAt: -1, status: 1 });
 
     res.json({ mns, pages: total <= limit ? 1 : Math.ceil(total / limit) });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -304,10 +348,10 @@ const getMasternodes = async (req, res) => {
 const getMasternodeByAddress = async (req, res) => {
   try {
     const hash = req.params.hash;
-    const mns = await Masternode.findOne({ addr: hash});
+    const mns = await Masternode.findOne({ addr: hash });
 
     res.json({ mns });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -323,7 +367,7 @@ const getMasternodeCount = async (req, res) => {
     const coin = await Coin.findOne().sort({ createdAt: -1 });
 
     res.json({ enabled: coin.mnsOn, total: coin.mnsOff + coin.mnsOn });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -356,18 +400,29 @@ const getPeer = (req, res) => {
  */
 const getSupply = async (req, res) => {
   try {
-    let c = 0; // Circulating supply.
-    let t = 0; // Total supply.
+    let total_supply = 0
+    let masternode_locked = 0  // All Coins locked up from Masternodes
+    let burned_coins = 0 //Coins which have been Burned
 
-    const utxo = await UTXO.aggregate([
+    //Get the Masternode Count
+    const coin_q = Coin.findOne().sort({ createdAt: -1 });
+
+    const utxo_q = UTXO.aggregate([
       { $group: { _id: 'supply', total: { $sum: '$value' } } }
     ]);
 
-    t = utxo[0].total;
-    c = t;
+    coin = await coin_q
+    utxo = await utxo_q
 
-    res.json({ c, t });
-  } catch(err) {
+    total_supply = utxo[0].total;
+    masternode_locked = (coin.mnsOff + coin.mnsOn) * chain.mncoins  // All Coins locked up from Masternodes
+    burned_coins = coin.burned; //Coins which have been Burned
+
+    circulation_supply = total_supply - masternode_locked - burned_coins //Total supply - Burned Coins and Colleteral locked
+
+    //res.json({ t:total_supply ,masternode_locked , burned_coins, c:circulation_supply});
+    res.json({ total_supply, masternode_locked, burned_coins, circulation_supply });
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -444,7 +499,7 @@ const getTX = async (req, res) => {
     });
 
     res.json({ ...tx.toObject(), vin });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -459,11 +514,19 @@ const getTXs = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
-    const total = await TX.find().sort({ blockHeight: -1 }).count();
-    const txs = await TX.find().skip(skip).limit(limit).sort({ blockHeight: -1 });
+    const total = await TX.find({ $nor: [{
+      "vin.address": "Generated",
+      "vin.value": "0"
+  }]}).sort({ blockHeight: -1 }).count();
+    const txs = await TX.find({
+      $nor: [{
+        "vin.address": "Generated",
+        "vin.value": "0"
+    }]
+    }).skip(skip).limit(limit).sort({ blockHeight: -1 });
 
     res.json({ txs, pages: total <= limit ? 1 : Math.ceil(total / limit) });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -502,7 +565,7 @@ const getTXsWeek = () => {
 
       cache = await TX.aggregate(qry);
       cutOff = moment().utc().add(90, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       loading = false;
@@ -524,7 +587,7 @@ const getTXsWeek = () => {
   };
 };
 
-module.exports =  {
+module.exports = {
   getAddress,
   getAvgBlockTime,
   getAvgMNTime,

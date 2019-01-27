@@ -23,6 +23,8 @@ class Address extends Component {
     super(props);
     this.state = {
       address: '',
+      label: '',
+      comment: '',
       balance: 0.0,
       received: 0.0,
       error: null,
@@ -51,13 +53,15 @@ class Address extends Component {
       const address = this.props.match.params.hash;
       this.props
         .getAddress({ address })
-        .then(({ balance, received, txs, utxo }) => {
+        .then(({ balance, received, txs, utxo,label,comment }) => {
           this.setState({
             address,
             balance,
             received,
             txs,
             utxo,
+            label,
+            comment,
             loading: false,
             pages: Math.ceil(txs.length / this.state.size)
           });
@@ -96,6 +100,8 @@ class Address extends Component {
         <HorizontalRule title="Wallet Info" />
         <CardAddress
           address={ this.state.address }
+          label={ this.state.label }
+          comment={ this.state.comment }
           balance={ this.state.balance }
           received={ this.state.received }
           txs={ this.state.txs }

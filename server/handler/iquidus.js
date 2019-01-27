@@ -32,8 +32,8 @@ const getconnectioncount = async (req, res) => {
 
 const getblockcount = async (req, res) => {
   try {
-    const coin = await getCoin();
-    res.json(coin.blocks);
+    const block = await Block.findOne({}).sort({'height': -1});
+    res.json(block.height);
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);
@@ -123,10 +123,21 @@ const getaddress = blockex.getAddress;
 
 const getbalance = async (req, res) => {
   try {
-    const utxo = await UTXO.find({ address: req.params.hash });
-    let bal = 0.0;
-    utxo.forEach(tx => bal += tx.value);
-    res.json(bal);
+    // This api call takes 395.775 ms
+    // const utxo = await UTXO.find({ address: req.params.hash });
+    // let bal = 0.0;
+    // utxo.forEach(tx => bal += tx.value);
+    // res.json(bal);
+
+    //This is the new API Call it takes 141.882 ms
+    const bal = await UTXO.aggregate([
+      { "$match": { address:  req.params.hash} },
+      { $group: { _id: '$address', sum: { $sum: '$value' } } },
+    ]);
+    
+    if(bal[0] != null)
+      res.json(bal[0].sum);
+    else res.json(0.0);
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);
