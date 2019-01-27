@@ -1,6 +1,5 @@
 
 import Component from '../core/Component';
-import config from '../../config';
 import { isAddress, isBlock } from '../../lib/blockchain';
 import PropTypes from 'prop-types';
 import React from 'react';
