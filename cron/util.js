@@ -82,7 +82,7 @@ async function vin(rpctx, block) {
       });
 
 
-      txIds.add(`${vin.txid}:${vin.vout, index}`); //This is used for Unspend Transaction
+      txIds.add(`${vin.txid}:${vin.vout}`); //This is used for Unspend Transaction
     });
 
     //Remove unspent transactions.
