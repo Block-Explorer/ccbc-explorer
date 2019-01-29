@@ -65,14 +65,16 @@ async function syncBlocks(start, stop, clean = false) {
       nextblockhash: rpcblock.nextblockhash ? rpcblock.nextblockhash : 'TOBEDETERMINED',
       moneysupply: rpcblock.moneysupply ? rpcblock.moneysupply : 0,
       zerosupply : (typeof rpcblock[coin] !== 'undefined') ? rpcblock[coin] : null,
-      value_in :0,  //TODO: Implement Value Incomming (This needs to be done after everything Syncs OK)  
-      value_out :0, //TODO: Implement Value Outcomming Spent (This needs to be done after everything Syncs OK)  
-      value_fee :0, //TODO: Implement Value Fees (This needs to be done after everything Syncs OK)  
+      value_in :0, 
+      value_out :0,
+      value_fee :0,
       value_reward:0,
-      type: "unknown" //TODO: Add Types
+      type: "unknown" 
     });
 
-    
+    let value_in = 0
+    let value_out = 0
+    let value_fee = 0
     await forEachSeries(block.txs, async (txhash ,index) => {
       const rpctx = await util.getTX(txhash);
 
@@ -80,13 +82,15 @@ async function syncBlocks(start, stop, clean = false) {
       //console.log(feedback)
       if(block.type == 'unknown')
       block.type = feedback.type
-      block.value_in += feedback.value_in
-      block.value_out += feedback.value_out
-      block.value_fee += feedback.value_fee
-      
+      value_in  = Number(value_in)  +  Number(feedback.value_in)
+      value_out = Number(value_out) + Number(feedback.value_out)
+      value_fee = Number(value_fee) + Number(feedback.value_fee)      
     });
 
-    block.value_reward = parseFloat(block.value_out -  block.value_in + block.value_fee).toFixed(8)
+    block.value_in  = value_in
+    block.value_out = value_out
+    block.value_fee = value_fee
+    block.value_reward = Number(value_in) + Number(value_out) + Number(value_fee)
     //console.log(block)
 
     await block.save().catch((error) => {
