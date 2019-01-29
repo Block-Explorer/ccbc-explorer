@@ -47,7 +47,7 @@ const Block = mongoose.model('Block', new mongoose.Schema({
   value_in : { required: true, type: Number },
   value_out : { required: true, type: Number },
   value_fee : { required: true, type: Number },
-  value_reward : { required: true, type: Number },
+  value : { required: true, type: Number },
   type: {required: true, type: String} 
 }, { versionKey: false }), 'blocks');
 
