@@ -82,7 +82,7 @@ async function syncBlocks(start, stop, clean = false) {
       //console.log(feedback)
       if(block.type == 'unknown')
       block.type = feedback.type
-      value_in  = Number(value_in)  +  Number(feedback.value_in)
+      value_in  = Number(value_in)  + Number(feedback.value_in)
       value_out = Number(value_out) + Number(feedback.value_out)
       value_fee = Number(value_fee) + Number(feedback.value_fee)      
     });
