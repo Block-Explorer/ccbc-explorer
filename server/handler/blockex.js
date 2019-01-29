@@ -536,7 +536,7 @@ const getTXs = async (req, res) => {
 
     //Get some More Performance here
     const total = await total_q;
-    const txs_q = await txs_q;
+    const txs = await txs_q;
 
     res.json({ txs, pages: total <= limit ? 1 : Math.ceil(total / limit) });
   } catch (err) {
