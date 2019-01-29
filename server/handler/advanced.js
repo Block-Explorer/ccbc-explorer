@@ -8,7 +8,7 @@ const UTXO = require('../../model/utxo');
 const getBurnAddresses = async (req, res) => {
     try {
         const BurnAddress = await UTXO.aggregate([
-            { "$match": { "address": { $in: config.burnAddress.map(obj => { return obj.address }) } } },
+            { "$match": { "address": { $in: config.module.burnAddress.address.map(obj => { return obj.address }) } } },
             { $group: { _id: '$address', sum: { $sum: '$value' } } },
         ]);
         if (BurnAddress[0] != null)
@@ -31,7 +31,7 @@ const getBurnAddresses = async (req, res) => {
 const getBurnedCoins = async (req, res) => {
     try {
         const BurnedCoins = await UTXO.aggregate([
-            { "$match": { "address": { $in: config.burnAddress.map(obj => { return obj.address }) } } },
+            { "$match": { "address": { $in: config.module.burnAddress.address.map(obj => { return obj.address }) } } },
             { $group: { _id: 'all', sum: { $sum: '$value' } } },
         ]);
         if (BurnedCoins[0] != null)
