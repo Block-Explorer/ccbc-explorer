@@ -36,7 +36,7 @@ const APIdata = [
         {
           name: 'getBurnedCoins',
           info: 'Returns Burned Coins',
-          path: '/api/getBurnedcoins'
+          path: '/api/getburnedcoins'
         },
         {
           name: 'getMasternodes',
