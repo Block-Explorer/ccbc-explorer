@@ -452,7 +452,7 @@ const getTop100 = (req, res) => {
  * @param {Object} res The response object.
  */
 const getTXLatest = (req, res) => {
-  TX.find()
+  TX.find({'vin.address': { $ne: "Generated" }}) //TODO: Need to find a better fix for this
     .limit(10)
     .sort({ blockHeight: -1 })
     .then((docs) => {
