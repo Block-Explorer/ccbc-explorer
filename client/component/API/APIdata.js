@@ -29,6 +29,16 @@ const APIdata = [
           path: '/api/coin/history'
         },
         {
+          name: 'getBurnAddresses',
+          info: 'Returns all Burning Addreses with coins',
+          path: '/api/getburnaddresses'
+        },
+        {
+          name: 'getBurnedCoins',
+          info: 'Returns Burned Coins',
+          path: '/api/getBurnedcoins'
+        },
+        {
           name: 'getMasternodes',
           info: 'Returns masternode information.',
           path: '/api/masternode'
