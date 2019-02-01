@@ -56,17 +56,21 @@ async function syncCoin() {
       { "$match": { "address": { $in: config.module.burnAddress.address.map(obj => { return obj.address }) } } },
       { $group: { _id: 'burned', sum: { $sum: '$value' } } },
     ]);
-    if (BurnAddress[0] !== null)  burned = BurnAddress[0].sum
+    if (BurnAddress && BurnAddress[0] && BurnAddress[0].sum)  burned = BurnAddress[0].sum
   }
 
-  
+  let coinSupply = 0
+  if(results[0]) 
+     coinSupply = results[0].total 
+  else if (info.moneysupply) 
+     coinSupply = info.moneysupply
 
   let market = {
     "USD_Price": cb.last * btc[0].price_usd,
-    "USD_Cap": results[0].total * (cb.last * btc[0].price_usd),
-    "Suppply": results[0].total,
+    "USD_Cap": coinSupply * (cb.last * btc[0].price_usd),
+    "Suppply": coinSupply,
     "BTC_Price": cb.last,
-    "BTC_Volume": results[0].total * cb.last
+    "BTC_Volume": coinSupply * cb.last
   };
   //console.log(market);
 
@@ -83,7 +87,7 @@ async function syncCoin() {
     peers: info.connections,
     status: 'Online',
     //supply: results.length ? results[0].total : market.data.circulating_supply || market.data.total_supply,
-    supply: results.length ? results[0].total : 0,
+    supply:coinSupply,
     //usd: market.data.quotes.USD.price
     usd: market.USD_Price !== null ? market.USD_Price : 0
 

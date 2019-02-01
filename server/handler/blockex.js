@@ -156,8 +156,12 @@ const getAvgMNTime = () => {
 
     try {
       const date = moment.utc().subtract(24, 'hours').toDate();
-      const blocks = await Block.find({ createdAt: { $gt: date } });
-      const mns = await Masternode.find();
+      const blocks_q =  Block.find({ createdAt: { $gt: date } });
+      const mns_q =  Masternode.find();
+
+      //Get some Performance here
+      const blocks = await blocks_q;
+      const mns = await mns_q;
 
       cache = (24.0 / (blocks.length / mns.length));
       cutOff = moment().utc().add(5, 'minutes').unix();
@@ -330,8 +334,12 @@ const getMasternodes = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
-    const total = await Masternode.find().sort({ lastPaidAt: -1, status: 1 }).count();
-    const mns = await Masternode.find().skip(skip).limit(limit).sort({ lastPaidAt: -1, status: 1 });
+    const total_q = Masternode.find().sort({ lastPaidAt: -1, status: 1 }).count();
+    const mns_q = Masternode.find().skip(skip).limit(limit).sort({ lastPaidAt: -1, status: 1 });
+
+    //Get some More Performance here
+    const total = await total_q;
+    const mns = await mns_q;
 
     res.json({ mns, pages: total <= limit ? 1 : Math.ceil(total / limit) });
   } catch (err) {
@@ -411,6 +419,7 @@ const getSupply = async (req, res) => {
       { $group: { _id: 'supply', total: { $sum: '$value' } } }
     ]);
 
+    //Get some More Performance here
     coin = await coin_q
     utxo = await utxo_q
 
@@ -452,7 +461,7 @@ const getTop100 = (req, res) => {
  * @param {Object} res The response object.
  */
 const getTXLatest = (req, res) => {
-  TX.find()
+  TX.find({'vin.address': { $ne: "Generated" }}) //TODO: Need to find a better fix for this
     .limit(10)
     .sort({ blockHeight: -1 })
     .then((docs) => {
@@ -514,16 +523,20 @@ const getTXs = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
-    const total = await TX.find({ $nor: [{
+    const total_q =  TX.find({ $nor: [{
       "vin.address": "Generated",
       "vin.value": "0"
   }]}).sort({ blockHeight: -1 }).count();
-    const txs = await TX.find({
+    const txs_q = TX.find({
       $nor: [{
         "vin.address": "Generated",
         "vin.value": "0"
     }]
     }).skip(skip).limit(limit).sort({ blockHeight: -1 });
+
+    //Get some More Performance here
+    const total = await total_q;
+    const txs = await txs_q;
 
     res.json({ txs, pages: total <= limit ? 1 : Math.ceil(total / limit) });
   } catch (err) {

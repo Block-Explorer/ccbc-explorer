@@ -28,6 +28,26 @@ export default class CardBlock extends Component {
           <span className="card__result">{ this.props.block.height }</span>
         </div>
         <div className="card__row">
+          <span className="card__label">Total Block Value:</span>
+          <span className="card__result">//TODO: Need Impmement CCBC</span>
+        </div>
+        <div className="card__row">
+          <span className="card__label">Block Reward :</span>
+          <span className="card__result">{ parseFloat(this.props.block.value_out -  this.props.block.value_in + this.props.block.value_fee).toFixed(2)  } CCBC</span>
+        </div>
+        <div className="card__row">
+          <span className="card__label">TXIN Value (Incomming):</span>
+          <span className="card__result">{ this.props.block.value_in } CCBC</span>
+        </div>
+        <div className="card__row">
+          <span className="card__label">TXOUT Value (Outgoing):</span>
+          <span className="card__result">{ this.props.block.value_out } CCBC</span>
+        </div>
+        <div className="card__row">
+          <span className="card__label">Fee:</span>
+          <span className="card__result">{ this.props.block.value_fee } CCBC</span>
+        </div>
+        <div className="card__row">
           <span className="card__label">Difficulty:</span>
           <span className="card__result">{ this.props.block.diff }</span>
         </div>
