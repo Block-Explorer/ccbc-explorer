@@ -29,7 +29,7 @@ export default class CardBlock extends Component {
         </div>
         <div className="card__row">
           <span className="card__label">Total Block Value:</span>
-          <span className="card__result">//TODO: Need Impmement CCBC</span>
+          <span className="card__result">{ this.props.block.value }</span>
         </div>
         <div className="card__row">
           <span className="card__label">Block Reward :</span>
@@ -49,7 +49,7 @@ export default class CardBlock extends Component {
         </div>
         <div className="card__row">
           <span className="card__label">Difficulty:</span>
-          <span className="card__result">{ this.props.block.diff }</span>
+          <span className="card__result">{ this.props.block.difficulty }</span>
         </div>
         <div className="card__row">
           <span className="card__label">Confirmations:</span>
