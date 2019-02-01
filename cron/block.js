@@ -90,7 +90,7 @@ async function syncBlocks(start, stop, clean = false) {
     block.value_in  = value_in
     block.value_out = value_out
     block.value_fee = value_fee
-    block.value = Number(value_in) + Number(value_out) + Number(value_fee)
+    block.value = Number(value_out) + Number(value_fee)
     //console.log(block)
 
     await block.save().catch((error) => {
