@@ -105,6 +105,7 @@ const htmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
+const config = require('./config');
 
 
 module.exports = {
@@ -176,7 +177,8 @@ module.exports = {
         ),
         new webpack.DefinePlugin({
           'process.env': {
-            'NODE_ENV': JSON.stringify('production')
+            'NODE_ENV': JSON.stringify('production'),
+            'config.api':JSON.stringify(config.api)
           }
         }),
        //new BundleAnalyzerPlugin(),
